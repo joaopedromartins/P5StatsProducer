@@ -20,8 +20,12 @@ public class DurableTopicRecvClient implements MessageListener
     TopicSession session = null;
     Topic topic = null;
     
-    private void setupPubSub()
-        throws JMSException, NamingException
+    /**
+     * SETUP JMS CONNECTION
+     * @throws JMSException
+     * @throws NamingException
+     */
+    public void setupPubSub() throws JMSException, NamingException
     {
         InitialContext iniCtx = new InitialContext();
         Object tmp = iniCtx.lookup("jms/RemoteConnectionFactory");
@@ -35,34 +39,37 @@ public class DurableTopicRecvClient implements MessageListener
         conn.start();
     }
     
+    
     @Override
     public void onMessage(Message msg) {
-     TextMessage tmsg = (TextMessage) msg;
-     try {
-      System.out.println("Got message: " + tmsg.getText());
-     } catch (JMSException e) {
-      e.printStackTrace();
-     }
+    	TextMessage tmsg = (TextMessage) msg;
+    	try {
+    		System.out.println("Got message: " + tmsg.getText());
+    		
+    		
+    	} catch (JMSException e) {
+    		e.printStackTrace();
+    	}
     }
     
-    private void recvAsync()
+    public void recvSync()
         throws JMSException, NamingException
     {
         System.out.println("Begin recvAsync");
         // Setup the pub/sub connection, session
         setupPubSub();
-//        // Wait upto 5 seconds for the message
-        TopicSubscriber recv = session.createDurableSubscriber(topic, "jms-ex1dtps");
+        // Wait upto 60 seconds for the message
+        TopicSubscriber recv = session.createDurableSubscriber(topic, "jms-stats");
         recv.setMessageListener(this);
-//        Message msg = recv.receive(5000);
-//        if (msg == null) {
-//            System.out.println("Timed out waiting for msg");
-//        } else {
-//            System.out.println("DurableTopicRecvClient.recv, msgt=" + msg);
-//        } 
+        Message msg = recv.receive(60000);
+        if (msg == null) {
+        	System.out.println("Timed out waiting for msg");
+        } else {
+        	System.out.println("DurableTopicRecvClient.recv, msgt=" + msg);
+        } 
     }
     
-    private void stop() 
+    public void stop() 
         throws JMSException
     {
         conn.stop();
@@ -70,17 +77,14 @@ public class DurableTopicRecvClient implements MessageListener
         conn.close();
     }
     
+    
     public void listen() throws JMSException, NamingException, IOException{
-    	//Scanner sc = new Scanner(System.in);
     	System.out.println("Begin DurableTopicRecvClient, now=" + System.currentTimeMillis());
     	DurableTopicRecvClient client = new DurableTopicRecvClient();
-    	client.recvAsync();
-    	System.out.println("Write exit to finish...");
-		//while(!sc.nextLine().equalsIgnoreCase("exit")){
-		//	continue;
-    	//}
+    	client.recvSync();
     	client.stop();
     	System.out.println("End DurableTopicRecvClient");
-    	System.exit(0);
+    	return;
     }
+    
 }
