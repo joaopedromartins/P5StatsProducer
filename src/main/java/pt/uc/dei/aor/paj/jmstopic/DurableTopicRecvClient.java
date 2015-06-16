@@ -32,7 +32,7 @@ public class DurableTopicRecvClient implements MessageListener
 
         TopicConnectionFactory tcf = (TopicConnectionFactory) tmp;
         conn = tcf.createTopicConnection("user", "123");
-        conn.setClientID("jms-ex1dtps");
+        conn.setClientID("jms-stats");
         topic = (Topic) iniCtx.lookup("jms/topic/PlayTopic");
 
         session = conn.createTopicSession(false, TopicSession.AUTO_ACKNOWLEDGE); 
@@ -42,49 +42,41 @@ public class DurableTopicRecvClient implements MessageListener
     
     @Override
     public void onMessage(Message msg) {
+    	System.out.println("////////////////////////////////////// onMessage ///////////////////////////////////////");
     	TextMessage tmsg = (TextMessage) msg;
     	try {
-    		System.out.println("Got message: " + tmsg.getText());
-    		
-    		
-    	} catch (JMSException e) {
-    		e.printStackTrace();
-    	}
-    }
+			System.out.println("Got message: " + tmsg.getText());
+		} catch (JMSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	pt.uc.dei.aor.paj.StatsProducerMain.gotNewMessage(tmsg);
+
+    	System.out.println("////////////////////////////////////// FIM onMessage ///////////////////////////////////////");
+    }    
     
-    public void recvSync()
-        throws JMSException, NamingException
-    {
+    private void recvAsync() throws JMSException, NamingException {
         System.out.println("Begin recvAsync");
         // Setup the pub/sub connection, session
         setupPubSub();
-        // Wait upto 60 seconds for the message
         TopicSubscriber recv = session.createDurableSubscriber(topic, "jms-stats");
         recv.setMessageListener(this);
-        Message msg = recv.receive(60000);
-        if (msg == null) {
-        	System.out.println("Timed out waiting for msg");
-        } else {
-        	System.out.println("DurableTopicRecvClient.recv, msgt=" + msg);
-        } 
     }
+
     
-    public void stop() 
-        throws JMSException
-    {
+    public void stop() throws JMSException {
         conn.stop();
         session.close();
         conn.close();
     }
     
     
-    public void listen() throws JMSException, NamingException, IOException{
+    public void listenJMS() throws JMSException, NamingException, IOException {
     	System.out.println("Begin DurableTopicRecvClient, now=" + System.currentTimeMillis());
-    	DurableTopicRecvClient client = new DurableTopicRecvClient();
-    	client.recvSync();
-    	client.stop();
+    	recvAsync();
+    	stop();
     	System.out.println("End DurableTopicRecvClient");
-    	return;
     }
     
 }

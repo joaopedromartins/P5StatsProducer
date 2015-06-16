@@ -27,9 +27,9 @@ public class XmlJmsConverter {
 		return builder.parse(is);
 	}
 	
-	public static void createXML(Document file) throws TransformerFactoryConfigurationError, TransformerException{
+	public static void createXML(Document file, String filename) throws TransformerFactoryConfigurationError, TransformerException{
 		Transformer transformer = TransformerFactory.newInstance().newTransformer();
-		Result output = new StreamResult(new File("latestnews.xml"));
+		Result output = new StreamResult(new File(filename));
 		Source input = new DOMSource(file);
 		transformer.transform(input, output);
 	}
