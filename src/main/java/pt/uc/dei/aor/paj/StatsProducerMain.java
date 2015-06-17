@@ -33,8 +33,9 @@ public class StatsProducerMain {
 
 	}
 	
-	public static void gotNewMessage(TextMessage msg){
+	public void gotNewMessage(TextMessage msg){
 		try {
+			System.out.println("Nova mensagem: " );
 			doc = XmlJmsConverter.loadXMLFromString(msg.getText());
 			XmlJmsConverter.createXML(doc, "latestnews.xml");
 			if(XMLValidation.validateXMLSchema("src/main/resources/modelo.xsd", "latestnews.xml")){
@@ -42,12 +43,10 @@ public class StatsProducerMain {
 			} else {
 				System.out.println("O XML recebido não é válido!");
 			}
-			
-			System.out.println("nova mensagem: " );
+			System.out.println("Fim nova mensagem: " );
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-
 }

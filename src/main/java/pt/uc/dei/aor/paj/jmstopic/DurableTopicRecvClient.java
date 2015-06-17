@@ -44,15 +44,8 @@ public class DurableTopicRecvClient implements MessageListener
     public void onMessage(Message msg) {
     	System.out.println("////////////////////////////////////// onMessage ///////////////////////////////////////");
     	TextMessage tmsg = (TextMessage) msg;
-    	try {
-			System.out.println("Got message: " + tmsg.getText());
-		} catch (JMSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	
-    	pt.uc.dei.aor.paj.StatsProducerMain.gotNewMessage(tmsg);
-
+    	pt.uc.dei.aor.paj.StatsProducerMain creator = new pt.uc.dei.aor.paj.StatsProducerMain();
+    	creator.gotNewMessage(tmsg);
     	System.out.println("////////////////////////////////////// FIM onMessage ///////////////////////////////////////");
     }    
     
