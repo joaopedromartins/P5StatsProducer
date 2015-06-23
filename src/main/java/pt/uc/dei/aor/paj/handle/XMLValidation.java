@@ -25,16 +25,13 @@ public class XMLValidation {
         try {
             SchemaFactory factory = 
                     SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Schema schema = factory.newSchema(new File(xsdPath.toURI()));
+            Schema schema = factory.newSchema(xsdPath);
             Validator validator = schema.newValidator();
             validator.validate(new StreamSource(new File(xmlPath)));
         } catch (IOException | SAXException e) {
             System.out.println("Exception: "+e.getMessage());
             return false;
-        } catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        } 
         return true;
     }
 }

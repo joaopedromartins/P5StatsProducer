@@ -34,14 +34,13 @@ public class StatsProducer {
 		try {
 			new DurableTopicRecvClient().listen();
 		} catch (JMSException | NamingException | IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Falha ao iniciar o cliente de estatística");
 		}
 
 	}
 	
 	public void gotNewMessage(TextMessage msg){		
-		URL url = StatsProducer.class.getResource("/modelo.xsd");		
+		URL url = StatsProducer.class.getResource("modelo.xsd");		
 		try {
 			String tmsg = msg.getText();
 			System.out.println("mensagem recebida com " + tmsg.length());
